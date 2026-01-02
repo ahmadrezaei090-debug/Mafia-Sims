@@ -69,40 +69,43 @@
             z-index: 900;
         }
         
-        .progress-container {
+        .progress-wrapper {
             position: absolute;
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
             max-width: 500px;
-            background: rgba(0, 0, 0, 0.3);
-            height: 15px;
-            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            height: 25px; /* تپل‌تر شده */
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px; /* فاصله با متن درصد */
         }
         
         .progress-bar {
             height: 100%;
             background: #F5DEB3; /* رنگ کرمی */
             width: 0%;
-            border-radius: 8px;
+            border-radius: 12px;
             transition: width 0.3s ease;
-            position: relative;
-            box-shadow: 0 0 15px rgba(245, 222, 179, 0.7);
+            box-shadow: 0 0 20px rgba(245, 222, 179, 0.8);
         }
         
         .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            color: #333;
+            display: block;
+            font-size: 16px;
+            color: #F5DEB3; /* همرنگ نوار */
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
         }
         
         /* انیمیشن‌ها */
@@ -135,10 +138,17 @@
                 font-size: 18px;
             }
             
-            .progress-container {
+            .progress-wrapper {
                 width: 90%;
-                height: 12px;
                 bottom: 40px;
+            }
+            
+            .progress-container {
+                height: 20px;
+            }
+            
+            .progress-text {
+                font-size: 14px;
             }
         }
         
@@ -152,14 +162,17 @@
                 font-size: 16px;
             }
             
-            .progress-container {
+            .progress-wrapper {
                 width: 90%;
-                height: 10px;
                 bottom: 30px;
             }
             
+            .progress-container {
+                height: 18px;
+            }
+            
             .progress-text {
-                font-size: 10px;
+                font-size: 12px;
             }
         }
     </style>
@@ -180,10 +193,11 @@
 
     <!-- صفحه لودینگ -->
     <div id="loading-page">
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar">
-                <span class="progress-text" id="progress-text">0%</span>
+        <div class="progress-wrapper">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
             </div>
+            <span class="progress-text" id="progress-text">0%</span>
         </div>
     </div>
 
@@ -191,11 +205,6 @@
         // منابعی که باید قبل از ورود به صفحه اصلی لود شوند
         const resourcesToPreload = [
             // در اینجا آدرس‌های تصاویر و فایل‌های مورد نیاز صفحات بعدی را قرار دهید
-            // مثال:
-            // 'https://example.com/image1.jpg',
-            // 'https://example.com/image2.jpg',
-            // 'https://example.com/background1.jpg',
-            // 'https://example.com/background2.jpg'
         ];
 
         // متغیرهای وضعیت
@@ -230,7 +239,7 @@
                 img.onerror = () => {
                     loadedResources++;
                     updateProgress();
-                    resolve(); // حتی اگر خطا داشت ادامه بده
+                    resolve();
                 };
                 img.src = url;
             });
@@ -252,7 +261,6 @@
                     if (fakeProgress > 100) {
                         clearInterval(fakeInterval);
                         fakeProgress = 100;
-                        // بعد از اتمام، به صفحه بعد برو
                         setTimeout(goToNextPage, 500);
                     }
                     
@@ -260,38 +268,27 @@
                     progressText.textContent = fakeProgress + '%';
                 }, 50);
             } else {
-                // منتظر لود شدن همه منابع بمان
                 await Promise.all(loadPromises);
-                
-                // کمی تأخیر برای نمایش 100%
                 setTimeout(goToNextPage, 500);
             }
         }
 
         // تابع برای رفتن به صفحه بعد
         function goToNextPage() {
-            // اینجا می‌توانید کاربر را به صفحه اصلی هدایت کنید
-            // window.location.href = 'main.html';
-            
-            // شبیه‌سازی رفتن به صفحه بعد
             setTimeout(() => {
                 alert('همه منابع لود شدند! آماده رفتن به صفحه اصلی.');
-                // در اینجا کد هدایت به صفحه اصلی قرار می‌گیرد
                 // window.location.href = 'main.html';
             }, 1000);
         }
 
-        // شروع کار: ابتدا صفحه intro را نشان می‌دهیم
+        // شروع کار
         setTimeout(() => {
-            // محو کردن صفحه intro
             introPage.style.opacity = '0';
-            
-            // پس از اتمام انیمیشن محو شدن
             setTimeout(() => {
                 introPage.style.display = 'none';
                 startLoading();
             }, 1000);
-        }, 3000); // 3 ثانیه نمایش صفحه intro
+        }, 3000);
 
         // جلوگیری از راست کلیک
         document.addEventListener('contextmenu', function(e) {
