@@ -1,1 +1,320 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استدیو اسکورت گیم - لودینگ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* صفحه اول */
+        #intro-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            max-width: 400px;
+            max-height: 400px;
+            border-radius: 10px;
+        }
+        
+        .presentation-text {
+            font-size: 24px;
+            text-align: center;
+            color: #f0f0f0;
+            margin-top: 20px;
+            padding: 0 20px;
+            line-height: 1.6;
+        }
+        
+        /* صفحه لودینگ */
+        #loading-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://raw.githubusercontent.com/ahmadrezaei090-debug/Mafia-Sims/main/IMG_%DB%B2%DB%B0%DB%B2%DB%B6%DB%B0%DB%B1%DB%B0%DB%B1_%DB%B1%DB%B3%DB%B1%DB%B6%DB%B1%DB%B1.jpg');
+            background-size: cover;
+            background-position: center;
+            display: none;
+            z-index: 900;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 80px;
+        }
+        
+        .progress-container {
+            width: 80%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #F5DEB3; /* رنگ کرمی */
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            position: relative;
+            box-shadow: 0 0 10px rgba(245, 222, 179, 0.5);
+        }
+        
+        .progress-text {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .logo {
+            animation: fadeIn 2s ease-out;
+        }
+        
+        .presentation-text {
+            animation: fadeIn 2.5s ease-out;
+        }
+        
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            .logo {
+                max-width: 300px;
+                max-height: 300px;
+            }
+            
+            .presentation-text {
+                font-size: 18px;
+            }
+            
+            .progress-container {
+                width: 90%;
+                height: 10px;
+            }
+            
+            .loading-overlay {
+                padding-bottom: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                max-width: 250px;
+                max-height: 250px;
+            }
+            
+            .presentation-text {
+                font-size: 16px;
+            }
+            
+            .progress-container {
+                width: 90%;
+                height: 8px;
+            }
+            
+            .loading-overlay {
+                padding-bottom: 50px;
+            }
+            
+            .progress-text {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحه اول -->
+    <div id="intro-page">
+        <div class="logo-container">
+            <img src="https://raw.githubusercontent.com/ahmadrezaei090-debug/sober/main/InShot_%DB%B2%DB%B0%DB%B2%DB%B5%DB%B1%DB%B2%DB%B1%DB%B4_%DB%B0%DB%B0%DB%B1%DB%B6%DB%B5%DB%B1%DB%B8%DB%B4%DB%B0.jpg" 
+                 alt="لوگو استدیو اسکورت گیم" 
+                 class="logo">
+        </div>
+        
+        <div class="presentation-text">
+            استدیو اسکورت گیم با افتخار تقدیم می‌کند
+        </div>
+    </div>
 
+    <!-- صفحه لودینگ -->
+    <div id="loading-page">
+        <div class="loading-overlay">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // منابعی که باید قبل از ورود به صفحه اصلی لود شوند
+        const resourcesToPreload = [
+            // در اینجا آدرس‌های تصاویر و فایل‌های مورد نیاز صفحات بعدی را قرار دهید
+            // مثال:
+            // 'https://example.com/image1.jpg',
+            // 'https://example.com/image2.jpg',
+            // 'https://example.com/background1.jpg',
+            // 'https://example.com/background2.jpg'
+        ];
+
+        // متغیرهای وضعیت
+        let loadedResources = 0;
+        let totalResources = resourcesToPreload.length;
+        
+        // عناصر DOM
+        const introPage = document.getElementById('intro-page');
+        const loadingPage = document.getElementById('loading-page');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        // تابع برای به‌روزرسانی نوار پیشرفت
+        function updateProgress() {
+            const percentage = totalResources > 0 
+                ? Math.round((loadedResources / totalResources) * 100) 
+                : 100;
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = percentage + '%';
+        }
+
+        // تابع برای لود کردن هر منبع
+        function loadResource(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedResources++;
+                    updateProgress();
+                    resolve();
+                };
+                img.onerror = () => {
+                    loadedResources++;
+                    updateProgress();
+                    resolve(); // حتی اگر خطا داشت ادامه بده
+                };
+                img.src = url;
+            });
+        }
+
+        // تابع برای شروع لودینگ
+        async function startLoading() {
+            // نمایش صفحه لودینگ
+            loadingPage.style.display = 'block';
+            
+            // لود کردن همه منابع
+            const loadPromises = resourcesToPreload.map(url => loadResource(url));
+            
+            // اگر منابعی برای لود نداریم، نوار پیشرفت را شبیه‌سازی می‌کنیم
+            if (totalResources === 0) {
+                let fakeProgress = 0;
+                const fakeInterval = setInterval(() => {
+                    fakeProgress += 2;
+                    if (fakeProgress > 100) {
+                        clearInterval(fakeInterval);
+                        fakeProgress = 100;
+                        // بعد از اتمام، به صفحه بعد برو
+                        setTimeout(goToNextPage, 500);
+                    }
+                    
+                    progressBar.style.width = fakeProgress + '%';
+                    progressText.textContent = fakeProgress + '%';
+                }, 50);
+            } else {
+                // منتظر لود شدن همه منابع بمان
+                await Promise.all(loadPromises);
+                
+                // کمی تأخیر برای نمایش 100%
+                setTimeout(goToNextPage, 500);
+            }
+        }
+
+        // تابع برای رفتن به صفحه بعد
+        function goToNextPage() {
+            // اینجا می‌توانید کاربر را به صفحه اصلی هدایت کنید
+            // window.location.href = 'main.html';
+            
+            // فعلاً پیام نشان می‌دهیم
+            console.log('همه منابع با موفقیت بارگذاری شدند!');
+            
+            // شبیه‌سازی رفتن به صفحه بعد
+            setTimeout(() => {
+                alert('همه منابع لود شدند! آماده رفتن به صفحه اصلی.');
+                // در اینجا کد هدایت به صفحه اصلی قرار می‌گیرد
+                // window.location.href = 'main.html';
+            }, 1000);
+        }
+
+        // شروع کار: ابتدا صفحه intro را نشان می‌دهیم
+        setTimeout(() => {
+            // محو کردن صفحه intro
+            introPage.style.opacity = '0';
+            
+            // پس از اتمام انیمیشن محو شدن
+            setTimeout(() => {
+                introPage.style.display = 'none';
+                startLoading();
+            }, 1000);
+        }, 3000); // 3 ثانیه نمایش صفحه intro
+
+        // جلوگیری از راست کلیک
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
